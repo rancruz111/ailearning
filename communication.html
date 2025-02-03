@@ -4,23 +4,29 @@
     <title>Communication Training AI Interface</title>
 </head>
 <body>
-    <div id="response">AI Interface Loading...</div>
+    <div id="response">Starting up...</div>
     <script>
-        // Tell Storyline we're ready immediately
-        window.aiInterfaceReady = true;
+        // Let's announce ourselves very clearly
+        console.log("Communication interface starting...");
         
-        // Create a simple test function
-        async function handleLearnerInput(input, scenario) {
-            document.getElementById('response').innerText = 
-                `Received: ${input} for scenario: ${scenario}`;
-            return `Test response: I see you said "${input}"`;
+        // Create our test function
+        function handleLearnerInput(input, scenario) {
+            console.log("Received input:", input);
+            console.log("Received scenario:", scenario);
+            
+            // Return a simple response for testing
+            return Promise.resolve("TEST RESPONSE: You said '" + input + "'");
         }
         
-        // Make it available globally
-        window.handleLearnerInput = handleLearnerInput;
-        
-        // Show we're ready
-        document.getElementById('response').innerText = 'AI interface ready!';
+        // When the page fully loads...
+        window.onload = function() {
+            // Make our function available
+            window.handleLearnerInput = handleLearnerInput;
+            window.aiInterfaceReady = true;
+            
+            console.log("Interface ready!");
+            document.getElementById('response').innerText = 'Interface ready and waiting for input!';
+        };
     </script>
 </body>
 </html>
