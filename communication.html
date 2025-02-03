@@ -6,26 +6,46 @@
 <body>
     <div id="response">Starting up...</div>
     <script>
-        // Let's announce ourselves very clearly
-        console.log("Communication interface starting...");
-        
-        // Create our test function
-        function handleLearnerInput(input, scenario) {
-            console.log("Received input:", input);
-            console.log("Received scenario:", scenario);
-            
-            // Return a simple response for testing
-            return Promise.resolve("TEST RESPONSE: You said '" + input + "'");
+        // Create a more reliable way to communicate
+        class CommunicationInterface {
+            constructor() {
+                this.ready = false;
+                this.initializeInterface();
+            }
+
+            initializeInterface() {
+                // Announce ourselves
+                console.log("Initializing communication interface...");
+                
+                // Set up our handler
+                this.handleLearnerInput = async (input, scenario) => {
+                    console.log("Processing input:", input);
+                    try {
+                        return "TEST RESPONSE: You said: '" + input + "' regarding scenario: '" + scenario + "'";
+                    } catch (error) {
+                        console.error("Error processing input:", error);
+                        throw error;
+                    }
+                };
+
+                // Make ourselves available globally
+                window.communicationInterface = this;
+                window.handleLearnerInput = this.handleLearnerInput;
+                
+                // Signal we're ready
+                this.ready = true;
+                console.log("Interface fully initialized!");
+                document.getElementById('response').innerText = 'Communication system ready!';
+            }
+
+            isReady() {
+                return this.ready;
+            }
         }
-        
-        // When the page fully loads...
+
+        // Create our interface when the page loads
         window.onload = function() {
-            // Make our function available
-            window.handleLearnerInput = handleLearnerInput;
-            window.aiInterfaceReady = true;
-            
-            console.log("Interface ready!");
-            document.getElementById('response').innerText = 'Interface ready and waiting for input!';
+            new CommunicationInterface();
         };
     </script>
 </body>
