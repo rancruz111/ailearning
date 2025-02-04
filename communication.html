@@ -4,49 +4,37 @@
     <title>Communication Training AI Interface</title>
 </head>
 <body>
-    <div id="response">Starting up...</div>
+    <div id="response">System starting...</div>
     <script>
-        // Create a more reliable way to communicate
-        class CommunicationInterface {
-            constructor() {
-                this.ready = false;
-                this.initializeInterface();
-            }
-
-            initializeInterface() {
-                // Announce ourselves
-                console.log("Initializing communication interface...");
+        // Let's make our communication system as simple as possible
+        document.addEventListener('DOMContentLoaded', function() {
+            // This function will process our inputs
+            window.handleLearnerInput = function(input, scenario) {
+                // Log what we received to help with debugging
+                console.log('Received input:', input);
+                console.log('Received scenario:', scenario);
                 
-                // Set up our handler
-                this.handleLearnerInput = async (input, scenario) => {
-                    console.log("Processing input:", input);
-                    try {
-                        return "TEST RESPONSE: You said: '" + input + "' regarding scenario: '" + scenario + "'";
-                    } catch (error) {
-                        console.error("Error processing input:", error);
-                        throw error;
-                    }
-                };
-
-                // Make ourselves available globally
-                window.communicationInterface = this;
-                window.handleLearnerInput = this.handleLearnerInput;
+                // First, update our display
+                document.getElementById('response').innerText = 
+                    'Processing: "' + input + '"';
                 
-                // Signal we're ready
-                this.ready = true;
-                console.log("Interface fully initialized!");
-                document.getElementById('response').innerText = 'Communication system ready!';
-            }
+                // Create a simple test response
+                return new Promise((resolve) => {
+                    // We'll respond after a short delay to simulate AI processing
+                    setTimeout(() => {
+                        resolve('TEST RESPONSE: I see you wrote "' + input + 
+                               '" about the scenario: "' + scenario + '"');
+                    }, 500);
+                });
+            };
 
-            isReady() {
-                return this.ready;
-            }
-        }
-
-        // Create our interface when the page loads
-        window.onload = function() {
-            new CommunicationInterface();
-        };
+            // Signal that we're ready
+            document.getElementById('response').innerText = 
+                'System ready for input!';
+            
+            // Make it very clear we're ready
+            window.systemReady = true;
+        });
     </script>
 </body>
 </html>
