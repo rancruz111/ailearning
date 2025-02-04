@@ -6,38 +6,40 @@
 <body>
     <div id="response">System starting...</div>
     <script>
-        // First, make our functions available to the parent window (Storyline)
-        function initializeSystem() {
-            console.log('Initializing communication system...');
+        // Set up a message listener to receive requests from Storyline
+        window.addEventListener('message', function(event) {
+            console.log('Received message:', event.data);
             
-            // Create our handler function
-            function handleInput(input, scenario) {
-                console.log('Processing input:', input);
+            // Process the incoming message
+            if (event.data.type === 'processInput') {
+                const input = event.data.input;
+                const scenario = event.data.scenario;
+                
+                console.log('Processing:', input, scenario);
                 document.getElementById('response').innerText = 
                     'Processing: ' + input;
                 
-                return Promise.resolve('Test response: You said "' + input + 
-                    '" about the deadline scenario.');
+                // Create our test response
+                const response = 'Test response: You said "' + input + 
+                    '" about the deadline scenario.';
+                
+                // Send the response back to Storyline
+                window.parent.postMessage({
+                    type: 'response',
+                    response: response
+                }, '*');
             }
-            
-            // Make everything available to the parent window (Storyline)
-            window.parent.systemReady = true;
-            window.parent.handleLearnerInput = handleInput;
-            
-            // Also keep local copies
-            window.systemReady = true;
-            window.handleLearnerInput = handleInput;
-            
-            document.getElementById('response').innerText = 
-                'System ready for input!';
-            console.log('System fully initialized');
-        }
+        });
 
-        // Initialize as soon as possible
-        initializeSystem();
-        
-        // Also initialize when the page loads
-        window.onload = initializeSystem;
+        // Signal that we're ready
+        document.getElementById('response').innerText = 
+            'System ready for input!';
+            
+        // Tell Storyline we're ready
+        window.parent.postMessage({
+            type: 'ready',
+            status: true
+        }, '*');
     </script>
 </body>
 </html>
