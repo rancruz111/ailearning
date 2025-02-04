@@ -6,43 +6,38 @@
 <body>
     <div id="response">System starting...</div>
     <script>
-        // Create our communication system immediately
-        (function initializeSystem() {
+        // First, make our functions available to the parent window (Storyline)
+        function initializeSystem() {
             console.log('Initializing communication system...');
             
-            // Make our function available immediately
-            window.handleLearnerInput = function(input, scenario) {
-                console.log('handleLearnerInput called with:', input, scenario);
-                
-                // Show we received the input
+            // Create our handler function
+            function handleInput(input, scenario) {
+                console.log('Processing input:', input);
                 document.getElementById('response').innerText = 
-                    'Processing input: ' + input;
+                    'Processing: ' + input;
                 
-                // Return a simple response for testing
-                return Promise.resolve('You said: "' + input + 
-                    '" regarding the scenario about missed deadlines. ' +
-                    'Let me help you craft an appropriate response.');
-            };
-
-            // Signal we're ready in multiple ways
-            window.systemReady = true;
-            window.aiInterfaceReady = true;
-            
-            // Update our display
-            document.getElementById('response').innerText = 
-                'Communication system ready!';
-                
-            console.log('System initialization complete!');
-        })();
-
-        // Also try to initialize when the page loads
-        window.onload = function() {
-            console.log('Page loaded, checking system status...');
-            if (!window.systemReady) {
-                console.log('System not ready, reinitializing...');
-                initializeSystem();
+                return Promise.resolve('Test response: You said "' + input + 
+                    '" about the deadline scenario.');
             }
-        };
+            
+            // Make everything available to the parent window (Storyline)
+            window.parent.systemReady = true;
+            window.parent.handleLearnerInput = handleInput;
+            
+            // Also keep local copies
+            window.systemReady = true;
+            window.handleLearnerInput = handleInput;
+            
+            document.getElementById('response').innerText = 
+                'System ready for input!';
+            console.log('System fully initialized');
+        }
+
+        // Initialize as soon as possible
+        initializeSystem();
+        
+        // Also initialize when the page loads
+        window.onload = initializeSystem;
     </script>
 </body>
 </html>
