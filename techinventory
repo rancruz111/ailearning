@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Armory // 42 Tools</title>
+    <style>
+        :root {
+            --accent: #6366f1;
+            --bg: #f8fafc;
+            --card-front: #ffffff;
+            --card-back: #1e293b;
+            --text-main: #0f172a;
+            --text-sub: #64748b;
+            --safe: #10b981;
+            --danger: #ef4444;
+            --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        * { box-sizing: border-box; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            margin: 0;
+            color: var(--text-main);
+        }
+
+        header { padding: 3rem 2rem; text-align: center; }
+        
+        .counter-badge {
+            background: white; padding: 6px 16px; border-radius: 20px;
+            font-weight: 700; color: var(--accent); box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            display: inline-block; margin-bottom: 1rem;
+        }
+
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 2rem 5rem; }
+
+        .filter-dock {
+            background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(15px);
+            padding: 1.5rem; border-radius: 24px; border: 1px solid white;
+            box-shadow: var(--shadow); margin-bottom: 3rem;
+            display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center;
+            position: sticky; top: 20px; z-index: 1000;
+        }
+
+        .filter-dock select, .filter-dock input {
+            padding: 0.7rem 1rem; border-radius: 12px; border: 1px solid #e2e8f0;
+            background: white; font-size: 0.9rem; outline: none;
+        }
+
+        .app-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+            gap: 2rem;
+        }
+
+        .card-perspective { height: 440px; perspective: 1200px; }
+        .card-inner {
+            position: relative; width: 100%; height: 100%;
+            transform-style: preserve-3d; transition: transform 0.7s;
+        }
+        .card-perspective:hover .card-inner { transform: rotateY(180deg); }
+
+        .card-front, .card-back {
+            position: absolute; width: 100%; height: 100%;
+            backface-visibility: hidden; border-radius: 24px;
+            padding: 1.8rem; box-shadow: var(--shadow); border: 1px solid white;
+            display: flex; flex-direction: column;
+        }
+
+        .card-front { background: white; z-index: 2; }
+        .card-back { background: var(--card-back); color: #f1f5f9; transform: rotateY(180deg); z-index: 1; border-color: #334155; }
+
+        .stage-pill { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem; display: block; }
+        .tool-title { font-size: 1.4rem; font-weight: 800; margin: 0; }
+        .meta-tag { background: #f1f5f9; font-size: 0.7rem; padding: 4px 8px; border-radius: 6px; color: var(--text-sub); font-weight: 600; margin-right: 4px; }
+        .tool-desc { color: var(--text-sub); font-size: 0.9rem; line-height: 1.5; margin-top: 1rem; flex-grow: 1; }
+        
+        .box { border-radius: 12px; padding: 10px; margin-bottom: 10px; font-size: 0.8rem; line-height: 1.4; }
+        .box-yes { background: rgba(16, 185, 129, 0.1); border-left: 3px solid var(--safe); }
+        .box-no { background: rgba(239, 68, 68, 0.1); border-left: 3px solid var(--danger); }
+        .box-title { font-weight: 800; display: block; margin-bottom: 2px; }
+
+        .btn-reset { background: var(--accent); color: white; border: none; padding: 0.7rem 1.5rem; border-radius: 12px; font-weight: 700; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="counter-badge" id="counter">Loading nodes...</div>
+    <h1 style="font-size: 2.5rem; margin: 0;">The Digital Armory</h1>
+    <p style="color: var(--text-sub);">All 42 verified tools. Hover to see how to use them safely.</p>
+</header>
+
+<div class="container">
+    <div class="filter-dock">
+        <input type="text" id="search" placeholder="Search by name...">
+        <select id="f-stage">
+            <option value="all">Stage (All)</option>
+            <option value="Foundation">Foundation</option>
+            <option value="Specialized">Specialized</option>
+            <option value="Advanced">Advanced</option>
+        </select>
+        <select id="f-time">
+            <option value="all">Time (All)</option>
+            <option value="Quick">Quick Start</option>
+            <option value="Moderate">Moderate</option>
+            <option value="Deep">Deep Learning</option>
+        </select>
+        <select id="f-level">
+            <option value="all">Level (All)</option>
+            <option value="🟢 Entry">Entry</option>
+            <option value="🟡 Intermed.">Intermediate</option>
+            <option value="🔴 Expert">Expert</option>
+        </select>
+        <button class="btn-reset" onclick="resetAll()">Reset</button>
+    </div>
+    <div class="app-grid" id="grid"></div>
+</div>
+
+<script>
+    const inventory = [
+        // AI TOOLS
+        { name: "SAGE AI", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "Our secure internal AI for private data.", yes: "Summarize a client contract or internal strategy.", no: "Don't use for public social media drafts." },
+        { name: "Microsoft Copilot", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "AI inside Word/Excel/Teams.", yes: "Drafting emails based on internal meeting notes.", no: "Avoid for deep web-research where SAGE is better." },
+        { name: "ChatGPT", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🟢 Public", desc: "External AI for creative brainstorming.", yes: "Finding a generic recipe or non-sensitive code fix.", no: "Never upload real client names or internal docs." },
+        { name: "Gemini", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🟢 Public", desc: "Google's smart web researcher.", yes: "Looking up industry trends or public news.", no: "Don't feed it any private internal strategy." },
+        
+        // MICROSOFT CORE
+        { name: "Word", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "Document creation and formal reports.", yes: "Writing internal policies or client proposals.", no: "Tracking massive data sets (use Excel)." },
+        { name: "Excel", stage: "Foundation", time: "Moderate", level: "🟡 Intermed.", sec: "🔴 Confidential", desc: "Data crunching and financial math.", yes: "Building budgets and tracking project spend.", no: "Writing long-form stories or diaries." },
+        { name: "PowerPoint", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "Visual presentations and decks.", yes: "Creating a pitch for a internal stakeholder.", no: "Editing high-res photos (use Photoshop)." },
+        { name: "Outlook", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "Email and personal calendar.", yes: "Formal professional communications.", no: "Quick water-cooler chats (use Teams)." },
+        { name: "Teams", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "Chat, video, and collaboration.", yes: "Instant questions and quick team syncs.", no: "Storing final files forever (use SharePoint)." },
+        { name: "OneNote", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "Digital notebook for messy ideas.", yes: "Meeting notes and brainstorming sessions.", no: "Formal report publishing for clients." },
+        { name: "OneDrive", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "Your personal work cloud storage.", yes: "Your working drafts and personal documents.", no: "Files the whole team needs (use SharePoint)." },
+        { name: "SharePoint", stage: "Foundation", time: "Moderate", level: "🟡 Intermed.", sec: "🔴 Confidential", desc: "Team sites and final file storage.", yes: "Final team assets and departmental news.", no: "Messy work-in-progress drafts." },
+        
+        // SPECIALIZED PRODUCTION
+        { name: "Snagit", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "Quick screenshots and video snippets.", yes: "Showing IT exactly where a bug appeared.", no: "Professional cinematic marketing films." },
+        { name: "Camtasia", stage: "Specialized", time: "Moderate", level: "🟡 Intermed.", sec: "🔴 Confidential", desc: "Advanced screen recording for L&D.", yes: "Making a polished 5-min software tutorial.", no: "Simple 5-second screenshots." },
+        { name: "Adobe Photoshop", stage: "Specialized", time: "Deep", level: "🔴 Expert", sec: "🟡 Internal", desc: "High-end photo editing.", yes: "Touching up pro portraits or creating art.", no: "Writing a 20-page text report." },
+        { name: "Adobe Illustrator", stage: "Specialized", time: "Deep", level: "🔴 Expert", sec: "🟡 Internal", desc: "Vector graphics and branding.", yes: "Designing a new logo or company icon.", no: "Editing pixel-based photographs." },
+        { name: "Adobe Premiere Pro", stage: "Specialized", time: "Deep", level: "🔴 Expert", sec: "🟡 Internal", desc: "Professional video editing.", yes: "Creating high-end brand videos.", no: "Quick internal screen recordings." },
+        { name: "Adobe After Effects", stage: "Specialized", time: "Deep", level: "🔴 Expert", sec: "🟡 Internal", desc: "Motion graphics and effects.", yes: "Adding animated text to a video project.", no: "Trimming a simple home video clip." },
+        { name: "Synthesia", stage: "Specialized", time: "Moderate", level: "🟡 Intermed.", sec: "🟡 Internal", desc: "AI avatars for training videos.", yes: "Creating a virtual host for an HR module.", no: "Sensitive leadership announcements." },
+        { name: "Rise 360", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "Mobile-friendly e-learning pages.", yes: "A scrollable 'welcome' course for new hires.", no: "Complex software technical sims." },
+        { name: "Well Said Labs", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🟡 Internal", desc: "Natural AI voiceovers.", yes: "Adding a narrator to a training video.", no: "Real-time customer service calls." },
+        { name: "Vyond", stage: "Specialized", time: "Moderate", level: "🟡 Intermed.", sec: "🟡 Internal", desc: "2D animated explainer videos.", yes: "Creating an animated video about safety.", no: "Photorealistic 3D modeling." },
+        { name: "Clipchamp", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🟡 Internal", desc: "Easy video editor for everyone.", yes: "Trimming the start of a recorded meeting.", no: "Cinematic color grading." },
+        { name: "Podbean", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🟡 Internal", desc: "Internal podcast hosting.", yes: "Distributing a leadership interview audio.", no: "Hosting 4K video training." },
+        { name: "Brightcove", stage: "Specialized", time: "Moderate", level: "🟡 Intermed.", sec: "🟡 Internal", desc: "Enterprise-grade video streaming.", yes: "Live broadcasting a Global Town Hall.", no: "Quick internal help clips." },
+        
+        // ADVANCED & AUTOMATION
+        { name: "Power BI", stage: "Advanced", time: "Deep", level: "🔴 Expert", sec: "🔴 Confidential", desc: "Interactive data dashboards.", yes: "Visualizing year-long company trends.", no: "Tracking a simple personal to-do list." },
+        { name: "Power Automate", stage: "Advanced", time: "Moderate", level: "🟡 Intermed.", sec: "🔴 Confidential", desc: "Automating boring tasks.", yes: "Auto-saving email files to SharePoint.", no: "Tasks requiring human emotional nuance." },
+        { name: "Power Apps", stage: "Advanced", time: "Deep", level: "🔴 Expert", sec: "🔴 Confidential", desc: "Custom business app builder.", yes: "Building an internal tool for desk booking.", no: "Simple one-off quizzes (use Forms)." },
+        { name: "Power Pages", stage: "Advanced", time: "Deep", level: "🔴 Expert", sec: "🔴 Confidential", desc: "External business websites.", yes: "A secure portal for vendor documents.", no: "Internal departmental news sites." },
+        { name: "Smartsheet", stage: "Advanced", time: "Moderate", level: "🟡 Intermed.", sec: "🔴 Confidential", desc: "Project management & automation.", yes: "Managing a project with 50+ milestones.", no: "Your personal daily shopping list." },
+        { name: "Storyline 360", stage: "Advanced", time: "Deep", level: "🔴 Expert", sec: "🔴 Confidential", desc: "Interactive e-learning sims.", yes: "A gameified course on software logic.", no: "A basic 10-slide presentation." },
+        { name: "Visio", stage: "Specialized", time: "Moderate", level: "🟡 Intermed.", sec: "🔴 Confidential", desc: "Technical diagramming tool.", yes: "Mapping out a complex IT network.", no: "Freehand artistic sketching." },
+        
+        // UTILITIES
+        { name: "Forms", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "Surveys and polls.", yes: "Gathering feedback on a team lunch.", no: "Building a relational database." },
+        { name: "Planner", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "Team kanban task boards.", yes: "Visualizing tasks for a group project.", no: "Tracking 1,000+ technical dependencies." },
+        { name: "Lists", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "Data and inventory logs.", yes: "Tracking tech equipment loans.", no: "Heavy financial math calculations." },
+        { name: "Whiteboard", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "Visual collaboration canvas.", yes: "Drawing a flow-chart in a live meeting.", no: "Final high-res graphic design." },
+        { name: "Bookings", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🟡 Internal", desc: "External client scheduling.", yes: "Letting a client book a 30-min slot.", no: "Scheduling internal team syncs." },
+        { name: "ToDo", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "Personal task tracker.", yes: "Your daily list of 'must-do' tasks.", no: "Managing tasks for a 10-person team." },
+        { name: "Stream", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "Internal video sharing hub.", yes: "Hosting a recording of a staff training.", no: "Public marketing videos." },
+        { name: "Sway", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🟡 Internal", desc: "Digital interactive reports.", yes: "An internal digital quarterly newsletter.", no: "A document that must be printed." },
+        { name: "PowerPoint Live", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "Interactive presentations.", yes: "Engaging a global audience in Teams.", no: "Static one-on-one document review." },
+        { name: "Loom", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🟡 Internal", desc: "Quick video messages.", yes: "Explaining a report via video vs email.", no: "Storing confidential client data." }
+    ];
+
+    function render() {
+        const grid = document.getElementById('grid');
+        const s = document.getElementById('search').value.toLowerCase();
+        const stage = document.getElementById('f-stage').value;
+        const time = document.getElementById('f-time').value;
+        const level = document.getElementById('f-level').value;
+
+        const filtered = inventory.filter(t => {
+            const mS = t.name.toLowerCase().includes(s) || t.desc.toLowerCase().includes(s);
+            const mStage = stage === 'all' || t.stage === stage;
+            const mTime = time === 'all' || t.time === time;
+            const mLevel = level === 'all' || t.level === level;
+            return mS && mStage && mTime && mLevel;
+        });
+
+        grid.innerHTML = '';
+        filtered.forEach(t => {
+            grid.innerHTML += `
+                <div class="card-perspective">
+                    <div class="card-inner">
+                        <div class="card-front">
+                            <span class="stage-pill">${t.stage}</span>
+                            <h3 class="tool-title">${t.name}</h3>
+                            <div style="margin: 0.8rem 0;">
+                                <span class="meta-tag">${t.level}</span>
+                                <span class="meta-tag">⏱️ ${t.time}</span>
+                            </div>
+                            <p class="tool-desc">${t.desc}</p>
+                            <div style="font-size: 0.75rem; font-weight:700; color:var(--accent)">🛡️ ${t.sec} Clearance</div>
+                        </div>
+                        <div class="card-back">
+                            <span class="box-title" style="color:#818cf8; margin-bottom:1rem">HOW TO USE IT</span>
+                            <div class="box box-yes">
+                                <span class="box-title">✅ Yes, do this:</span> ${t.yes}
+                            </div>
+                            <div class="box box-no">
+                                <span class="box-title">❌ No, avoid this:</span> ${t.no}
+                            </div>
+                            <p style="font-size:0.7rem; opacity:0.6; margin-top:auto; text-align:center">Hover away to flip back</p>
+                        </div>
+                    </div>
+                </div>`;
+        });
+        document.getElementById('counter').innerText = `FOUND: ${filtered.length} / ${inventory.length} NODES`;
+    }
+
+    function resetAll() {
+        document.getElementById('search').value = '';
+        document.querySelectorAll('select').forEach(sel => sel.value = 'all');
+        render();
+    }
+
+    document.querySelectorAll('input, select').forEach(el => el.addEventListener('input', render));
+    render();
+</script>
+</body>
+</html>
