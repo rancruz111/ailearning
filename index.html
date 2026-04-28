@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enterprise Armory // 43 Apps</title>
+    <title>Digital Armory // v6.0 Complete</title>
     <style>
         :root {
             --accent: #6366f1;
@@ -12,15 +12,16 @@
             --card-back: #1e293b;
             --text-main: #0f172a;
             --text-sub: #64748b;
-            --safe: #10b981;
-            --danger: #ef4444;
+            --secure-green: #10b981;
+            --public-red: #ef4444;
+            --internal-yellow: #f59e0b;
             --shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
         * { box-sizing: border-box; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, sans-serif;
             background: var(--bg);
             margin: 0;
             color: var(--text-main);
@@ -76,9 +77,14 @@
         .meta-tag { background: #f1f5f9; font-size: 0.7rem; padding: 4px 8px; border-radius: 6px; color: var(--text-sub); font-weight: 600; margin-right: 4px; }
         .tool-desc { color: var(--text-sub); font-size: 0.9rem; line-height: 1.5; margin-top: 1rem; flex-grow: 1; }
         
-        .box { border-radius: 12px; padding: 10px; margin-bottom: 10px; font-size: 0.8rem; line-height: 1.4; }
-        .box-yes { background: rgba(16, 185, 129, 0.1); border-left: 3px solid var(--safe); }
-        .box-no { background: rgba(239, 68, 68, 0.1); border-left: 3px solid var(--danger); }
+        .sec-badge { font-size: 0.75rem; font-weight: 800; margin-top: 1rem; display: flex; align-items: center; gap: 5px; }
+        .sec-green { color: var(--secure-green); } 
+        .sec-red { color: var(--public-red); }     
+        .sec-yellow { color: var(--internal-yellow); }
+
+        .box { border-radius: 12px; padding: 12px; margin-bottom: 10px; font-size: 0.82rem; line-height: 1.4; }
+        .box-yes { background: rgba(16, 185, 129, 0.1); border-left: 4px solid var(--secure-green); }
+        .box-no { background: rgba(239, 68, 68, 0.1); border-left: 4px solid var(--public-red); }
         .box-title { font-weight: 800; display: block; margin-bottom: 2px; }
 
         .btn-reset { background: var(--accent); color: white; border: none; padding: 0.7rem 1.5rem; border-radius: 12px; font-weight: 700; cursor: pointer; }
@@ -89,7 +95,9 @@
 <header>
     <div class="counter-badge" id="counter">Initializing Apps...</div>
     <h1 style="font-size: 2.5rem; margin: 0;">Digital Skillscape</h1>
-    <p style="color: var(--text-sub);">All 43 Apps Verified. Loom has been removed.</p>
+    <p style="color: var(--text-sub);">
+        🟢 = Safe for Firm Data | 🔴 = Public Only (Do Not Upload Secrets)
+    </p>
 </header>
 
 <div class="container">
@@ -101,19 +109,19 @@
             <option value="Specialized">Specialized</option>
             <option value="Advanced">Advanced</option>
         </select>
-        <select id="f-time">
-            <option value="all">Time (All)</option>
-            <option value="Quick">Quick Start</option>
-            <option value="Moderate">Moderate</option>
-            <option value="Deep">Deep Learning</option>
-        </select>
         <select id="f-level">
             <option value="all">Level (All)</option>
             <option value="🟢 Entry">Entry</option>
             <option value="🟡 Intermed.">Intermediate</option>
             <option value="🔴 Expert">Expert</option>
         </select>
-        <button class="btn-reset" onclick="resetAll()">Reset</button>
+        <select id="f-sec">
+            <option value="all">Data Safety (All)</option>
+            <option value="🟢 Confidential">🟢 Safe for Firm Data</option>
+            <option value="🔴 Public">🔴 Public Only (Hazard)</option>
+            <option value="🟡 Internal">🟡 Internal / General</option>
+        </select>
+        <button class="btn-reset" onclick="resetAll()">Reset View</button>
     </div>
     <div class="app-grid" id="grid"></div>
 </div>
@@ -121,78 +129,79 @@
 <script>
     const inventory = [
         // LMS & GROWTH
-        { name: "LEARN+", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "Our AI-powered LMS (Zensai) built into Teams. It's your hub for success and training.", yes: "Completing mandatory training or checking performance engagement directly in Teams.", no: "Looking for generic, unverified public training content." },
-        { name: "Oracle Learn", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "The company’s primary Learning Cloud for enterprise-level development.", yes: "Accessing corporate-wide training and tracking your formal learning paths.", no: "Creating quick social-media style videos for your own team (use Clipchamp)." },
+        { name: "LEARN+", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🟢 Confidential Approved", role: "Everyone", desc: "Our AI-powered LMS (Zensai) built right into Teams. Your hub for training and success.", yes: "Completing mandatory training or checking performance engagement in Teams.", no: "Looking for generic, unverified public training content here." },
+        { name: "Oracle Learn", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🟢 Confidential Approved", role: "Everyone", desc: "The company’s primary Learning Cloud for enterprise-level development.", yes: "Accessing corporate-wide training and tracking formal learning paths.", no: "Creating quick social videos for your team (use Clipchamp)." },
         
         // AI TOOLS
-        { name: "SAGE AI", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "Our secure internal AI for private data and firm-specific analysis.", yes: "Summarizing a confidential client contract or internal project plan.", no: "Drafting public marketing copy without a formal internal review." },
-        { name: "Microsoft Copilot", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "AI assistant inside Word, Excel, and Teams for instant productivity.", yes: "Drafting emails based on meeting notes or summarizing long email threads.", no: "Deep web-research on competitors where SAGE AI is the preferred tool." },
-        { name: "ChatGPT", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🟢 Public", desc: "External AI for creative brainstorming and generic non-sensitive writing.", yes: "Finding creative titles for an event or debugging simple, public code snippets.", no: "NEVER upload internal financial data, client names, or roadmap docs." },
-        { name: "Gemini", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🟢 Public", desc: "Google's AI researcher for gathering public information and news.", yes: "Researching industry trends or summarizing a public news article.", no: "Feeding it private strategy documents or sensitive client info." },
+        { name: "SAGE AI", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🟢 Confidential Approved", role: "Everyone", desc: "Our secure internal AI for private data and firm-specific analysis.", yes: "Summarizing confidential client contracts or internal project plans.", no: "Drafting public marketing copy without a formal internal review." },
+        { name: "Microsoft Copilot", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🟢 Confidential Approved", role: "Everyone", desc: "AI assistant inside Word, Excel, and Teams for instant productivity.", yes: "Drafting emails from notes or summarizing long email threads.", no: "Deep web-research on competitors (use SAGE AI instead)." },
+        { name: "ChatGPT", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🔴 Public Data Only", role: "Creative", desc: "External AI for creative brainstorming and generic writing.", yes: "Finding creative titles for an event or debugging public code.", no: "NEVER upload internal financial data, client names, or roadmap docs." },
+        { name: "Gemini", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🔴 Public Data Only", role: "Everyone", desc: "Google's AI researcher for gathering public information and news.", yes: "Researching industry trends or summarizing public news articles.", no: "Feeding it private strategy documents or sensitive client info." },
         
         // MICROSOFT CORE
-        { name: "Word", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "The gold standard for document creation and formal reports.", yes: "Writing internal policies, formal memos, or client proposals.", no: "Tracking massive data sets (Excel is much better for that)." },
-        { name: "Excel", stage: "Foundation", time: "Moderate", level: "🟡 Intermed.", sec: "🔴 Confidential", desc: "The powerhouse for data crunching, math, and spreadsheets.", yes: "Building budgets, data formulas, and tracking project spending.", no: "Using it as a long-form word processor or simple list-maker." },
-        { name: "PowerPoint", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "The primary tool for visual storytelling and presentation decks.", yes: "Creating a pitch for internal stakeholders or client-facing slides.", no: "Editing high-resolution photos (use Photoshop for that)." },
-        { name: "Outlook", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "Corporate email and calendar management hub.", yes: "Professional business comms and managing your daily schedule.", no: "Quick informal chats with your immediate team (use Teams)." },
-        { name: "Teams", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "Our virtual office for chat, video calls, and group collaboration.", yes: "Rapid-fire team questions and real-time project collaboration.", no: "Storing final documents forever (use SharePoint)." },
-        { name: "OneNote", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "Digital notebook for messy brainstorming and informal notes.", yes: "Taking quick meeting minutes or brainstorming creative projects.", no: "Publishing formal, final reports for external clients." },
-        { name: "OneDrive", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "Your personal work storage in the secure cloud.", yes: "Storing your working drafts and individual files you aren't ready to share.", no: "Primary storage for files the whole team needs to edit (use SharePoint)." },
-        { name: "SharePoint", stage: "Foundation", time: "Moderate", level: "🟡 Intermed.", sec: "🔴 Confidential", desc: "Team sites and final document storage repositories.", yes: "Storing final team assets and official departmental documentation.", no: "Saving your messy, personal work-in-progress drafts." },
+        { name: "Word", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🟢 Confidential Approved", role: "Everyone", desc: "The standard for document creation and formal reports.", yes: "Writing internal policies, formal memos, or client proposals.", no: "Tracking massive data sets (use Excel)." },
+        { name: "Excel", stage: "Foundation", time: "Moderate", level: "🟡 Intermed.", sec: "🟢 Confidential Approved", role: "Analysts", desc: "The powerhouse for data crunching and financial math.", yes: "Building budgets, data formulas, and tracking project spending.", no: "Using it as a long-form word processor or simple list-maker." },
+        { name: "PowerPoint", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🟢 Confidential Approved", role: "Everyone", desc: "The primary tool for visual storytelling and presentation decks.", yes: "Creating pitch decks or client-facing slides.", no: "Editing high-resolution photos (use Photoshop)." },
+        { name: "Outlook", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🟢 Confidential Approved", role: "Everyone", desc: "Corporate email and calendar management hub.", yes: "Professional business comms and managing your schedule.", no: "Quick informal chats with your immediate team (use Teams)." },
+        { name: "Teams", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🟢 Confidential Approved", role: "Everyone", desc: "Virtual office for chat, video calls, and group collaboration.", yes: "Rapid-fire team questions and real-time project collaboration.", no: "Storing final documents forever (use SharePoint)." },
+        { name: "OneNote", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🟢 Confidential Approved", role: "Everyone", desc: "Digital notebook for messy brainstorming and informal notes.", yes: "Taking meeting minutes or brainstorming creative projects.", no: "Publishing formal, final reports for external clients." },
+        { name: "OneDrive", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🟢 Confidential Approved", role: "Everyone", desc: "Personal work storage in the secure cloud.", yes: "Storing your working drafts and individual files.", no: "Primary storage for files the whole team needs (use SharePoint)." },
+        { name: "SharePoint", stage: "Foundation", time: "Moderate", level: "🟡 Intermed.", sec: "🟢 Confidential Approved", role: "Everyone", desc: "Team sites and final document storage repositories.", yes: "Storing final team assets and official documentation.", no: "Saving your messy, personal work-in-progress drafts." },
         
         // SPECIALIZED PRODUCTION
-        { name: "Snagit", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "Screen captures and markup to give clear visual feedback.", yes: "Circling an error on a screenshot to show IT exactly what's wrong.", no: "Editing professional-grade cinematic marketing videos." },
-        { name: "Camtasia", stage: "Specialized", time: "Moderate", level: "🟡 Intermed.", sec: "🔴 Confidential", desc: "Advanced screen recording and tutorial editing for training.", yes: "Making a polished 5-minute software tutorial for the team.", no: "Simple 5-second screenshots (use Snagit)." },
-        { name: "Adobe Photoshop", stage: "Specialized", time: "Deep", level: "🔴 Expert", sec: "🟡 Internal", desc: "Professional image manipulation and graphic design.", yes: "Touching up pro portraits or creating complex branded art.", no: "Writing a text-heavy, multi-page report." },
-        { name: "Adobe Illustrator", stage: "Specialized", time: "Deep", level: "🔴 Expert", sec: "🟡 Internal", desc: "Vector graphics for logos, icons, and crisp illustrations.", yes: "Designing a new logo or custom infographic for a project.", no: "Editing pixel-based photos (use Photoshop)." },
-        { name: "Adobe Premiere Pro", stage: "Specialized", time: "Deep", level: "🔴 Expert", sec: "🟡 Internal", desc: "Professional video production and non-linear editing.", yes: "Editing a high-quality, external-facing brand video.", no: "Quick internal screen recordings for tech help." },
-        { name: "Adobe After Effects", stage: "Specialized", time: "Deep", level: "🔴 Expert", sec: "🟡 Internal", desc: "Motion graphics and cinematic visual effects.", yes: "Adding animated text or motion graphics to a video project.", no: "Trimming simple, internal video update clips." },
-        { name: "Synthesia", stage: "Specialized", time: "Moderate", level: "🟡 Intermed.", sec: "🟡 Internal", desc: "AI video generation with realistic digital avatars.", yes: "Scaling training where you need a human face without a camera crew.", no: "Sensitive HR or leadership crisis communication." },
-        { name: "Rise 360", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "Mobile-responsive authoring for web-based courses.", yes: "Creating an interactive 'quick-start' course for a new process.", no: "Building extremely complex software simulators." },
-        { name: "Well Said Labs", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🟡 Internal", desc: "Natural AI voiceovers for professional audio.", yes: "Adding high-quality narration to an internal training video.", no: "Using it for real-time customer support calls." },
-        { name: "Vyond", stage: "Specialized", time: "Moderate", level: "🟡 Intermed.", sec: "🟡 Internal", desc: "2D animated explainer video creator.", yes: "Creating a fun, animated video to explain a new policy.", no: "Designing photorealistic 3D architectural models." },
-        { name: "Clipchamp", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🟡 Internal", desc: "Simple video editor for everyone with subtitle tools.", yes: "Trimming an internal video update before sharing it with the team.", no: "High-end cinematic color grading for a major campaign." },
-        { name: "Podbean", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🟡 Internal", desc: "Internal podcast hosting and distribution.", yes: "Sharing a leadership interview audio series for staff to listen to.", no: "Hosting 4K high-resolution video files." },
-        { name: "Brightcove", stage: "Specialized", time: "Moderate", level: "🟡 Intermed.", sec: "🟡 Internal", desc: "Enterprise video streaming for global audiences.", yes: "Live broadcasting a secure Global Town Hall event.", no: "Sharing small, disposable internal help clips." },
+        { name: "Snagit", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🟢 Confidential Approved", role: "Everyone", desc: "Screen captures and markup to give clear visual feedback.", yes: "Circling an error on a screenshot to show IT exactly what's wrong.", no: "Editing professional-grade cinematic marketing videos." },
+        { name: "Camtasia", stage: "Specialized", time: "Moderate", level: "🟡 Intermed.", sec: "🟢 Confidential Approved", role: "Training", desc: "Advanced screen recording and tutorial editing for training.", yes: "Making a polished 5-minute software tutorial for the team.", no: "Simple 5-second screenshots (use Snagit)." },
+        { name: "Adobe Photoshop", stage: "Specialized", time: "Deep", level: "🔴 Expert", sec: "🟡 Internal/General", role: "Creative", desc: "Professional image manipulation and graphic design.", yes: "Touching up pro portraits or creating branded art.", no: "Writing a text-heavy, multi-page report." },
+        { name: "Adobe Illustrator", stage: "Specialized", time: "Deep", level: "🔴 Expert", sec: "🟡 Internal/General", role: "Creative", desc: "Vector graphics for logos, icons, and crisp illustrations.", yes: "Designing a new logo or custom infographic for a project.", no: "Editing pixel-based photos (use Photoshop)." },
+        { name: "Adobe Premiere Pro", stage: "Specialized", time: "Deep", level: "🔴 Expert", sec: "🟡 Internal/General", role: "Creative", desc: "Professional video production and non-linear editing.", yes: "Editing a high-quality, external-facing brand video.", no: "Quick internal screen recordings for tech help." },
+        { name: "Adobe After Effects", stage: "Specialized", time: "Deep", level: "🔴 Expert", sec: "🟡 Internal/General", role: "Creative", desc: "Motion graphics and cinematic visual effects.", yes: "Animating a logo or adding motion graphics to video.", no: "Trimming simple, internal video update clips." },
+        { name: "Synthesia", stage: "Specialized", time: "Moderate", level: "🟡 Intermed.", sec: "🟡 Internal/General", role: "Training", desc: "AI video generation with realistic digital avatars.", yes: "Scaling training where you need a human face without a crew.", no: "Sensitive HR or leadership crisis communication." },
+        { name: "Rise 360", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🟢 Confidential Approved", role: "HR / L&D", desc: "Mobile-responsive authoring for web-based courses.", yes: "Creating an interactive 'quick-start' course for a new process.", no: "Building extremely complex software simulators." },
+        { name: "Well Said Labs", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🟡 Internal/General", role: "Creative", desc: "Natural AI voiceover generation.", yes: "Adding high-quality narration to a training video.", no: "Using it for real-time customer support calls." },
+        { name: "Vyond", stage: "Specialized", time: "Moderate", level: "🟡 Intermed.", sec: "🟡 Internal/General", role: "Training", desc: "2D animated explainer video creator.", yes: "Creating a fun, animated video to explain a new policy.", no: "Designing photorealistic 3D architectural models." },
+        { name: "Clipchamp", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🟡 Internal/General", role: "Everyone", desc: "Simple video editor for everyone with subtitle tools.", yes: "Trimming an internal video update before sharing it.", no: "High-end cinematic color grading." },
+        { name: "Podbean", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🟡 Internal/General", role: "Comms", desc: "Internal corporate podcast hosting and distribution.", yes: "Sharing a leadership interview audio series.", no: "Hosting 4K high-resolution video files." },
+        { name: "Brightcove", stage: "Specialized", time: "Moderate", level: "🟡 Intermed.", sec: "🟡 Internal/General", role: "Comms", desc: "Enterprise video streaming for global audiences.", yes: "Live broadcasting a Global Town Hall event.", no: "Sharing small, disposable internal help clips." },
         
         // ADVANCED & AUTOMATION
-        { name: "Power BI", stage: "Advanced", time: "Deep", level: "🔴 Expert", sec: "🔴 Confidential", desc: "Interactive dashboards and complex data visualization.", yes: "Building complex reports for leadership to track annual KPIs.", no: "Tracking simple personal to-do lists or daily chores." },
-        { name: "Power Automate", stage: "Advanced", time: "Moderate", level: "🟡 Intermed.", sec: "🔴 Confidential", desc: "Automating repetitive workflows between apps.", yes: "Auto-saving email attachments directly into a SharePoint folder.", no: "Automating tasks that require human nuance and empathy." },
-        { name: "Power Apps", stage: "Advanced", time: "Deep", level: "🔴 Expert", sec: "🔴 Confidential", desc: "Low-code custom business application builder.", yes: "Building an internal tool for a specific department's data entry.", no: "Creating simple surveys (use Forms instead)." },
-        { name: "Power Pages", stage: "Advanced", time: "Deep", level: "🔴 Expert", sec: "🔴 Confidential", desc: "Secure external-facing business websites.", yes: "Creating a portal for vendors to securely upload documents.", no: "Internal departmental news and announcements." },
-        { name: "Smartsheet", stage: "Advanced", time: "Moderate", level: "🟡 Intermed.", sec: "🔴 Confidential", desc: "Project management with automation and Gantt views.", yes: "Managing a project with 50+ interlinked tasks and owners.", no: "Tracking your own personal daily grocery list." },
-        { name: "Storyline 360", stage: "Advanced", time: "Deep", level: "🔴 Expert", sec: "🔴 Confidential", desc: "Highly interactive e-learning and software sims.", yes: "Building a gameified course for complex system training.", no: "Standard 10-slide text presentations." },
-        { name: "Visio", stage: "Specialized", time: "Moderate", level: "🟡 Intermed.", sec: "🔴 Confidential", desc: "Technical diagramming and process mapping tool.", yes: "Mapping out a complex IT network or a business process flow.", no: "Freehand artistic sketching or doodling." },
+        { name: "Power BI", stage: "Advanced", time: "Deep", level: "🔴 Expert", sec: "🟢 Confidential Approved", role: "Analysts", desc: "Interactive dashboards and complex data visualization.", yes: "Building complex reports for leadership to track KPIs.", no: "Tracking simple personal to-do lists." },
+        { name: "Power Automate", stage: "Advanced", time: "Moderate", level: "🟡 Intermed.", sec: "🟢 Confidential Approved", role: "Ops", desc: "Automating repetitive workflows between apps.", yes: "Auto-saving email attachments directly into SharePoint.", no: "Automating tasks that need human emotional intelligence." },
+        { name: "Power Apps", stage: "Advanced", time: "Deep", level: "🔴 Expert", sec: "🟢 Confidential Approved", role: "Developers", desc: "Low-code custom business application builder.", yes: "Building an internal tool for department data entry.", no: "Creating simple surveys (use Forms instead)." },
+        { name: "Power Pages", stage: "Advanced", time: "Deep", level: "🔴 Expert", sec: "🟢 Confidential Approved", role: "Developers", desc: "Secure external-facing business websites.", yes: "Creating a portal for vendors to upload documents.", no: "Internal departmental news and announcements." },
+        { name: "Smartsheet", stage: "Advanced", time: "Moderate", level: "🟡 Intermed.", sec: "🟢 Confidential Approved", role: "Managers", desc: "Project management with automation and Gantt views.", yes: "Managing a project with 50+ interlinked tasks.", no: "Tracking your own personal shopping list." },
+        { name: "Storyline 360", stage: "Advanced", time: "Deep", level: "🔴 Expert", sec: "🟢 Confidential Approved", role: "L&D", desc: "Highly interactive e-learning and software sims.", yes: "Building a gameified course for system training.", no: "Standard 10-slide text presentations." },
+        { name: "Visio", stage: "Specialized", time: "Moderate", level: "🟡 Intermed.", sec: "🟢 Confidential Approved", role: "IT", desc: "Technical diagramming and process mapping tool.", yes: "Mapping out a complex IT network or process flow.", no: "Freehand artistic sketching or doodling." },
         
         // UTILITIES
-        { name: "Forms", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "Simple surveys, quizzes, and feedback polls.", yes: "Gathering feedback on a recent workshop or a team lunch.", no: "Building a complex relational customer database." },
-        { name: "Planner", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "Visual kanban boards for team task management.", yes: "Visualizing the small steps needed for a group project.", no: "Tracking a 1,000-item technical dependency list." },
-        { name: "Lists", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "Information tracking for inventory and logs.", yes: "Tracking laptops or equipment checked out by the team.", no: "Heavy financial calculations (use Excel)." },
-        { name: "Whiteboard", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "Infinite digital canvas for visual collaboration.", yes: "Drawing a process flow live during a Teams meeting.", no: "Creating final, high-resolution branding logos." },
-        { name: "Bookings", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🟡 Internal", desc: "Let external clients book time on your calendar.", yes: "Sending a link to a client so they can book an intro call.", no: "Scheduling internal department syncs or recurring meetings." },
-        { name: "ToDo", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "Personal task tracker and daily organizer.", yes: "Checking off your personal 'must-do' tasks each morning.", no: "Managing a project for an entire 10-person team." },
-        { name: "Stream", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "Internal video storage and secure sharing hub.", yes: "Watching a recording of a staff training you missed.", no: "Hosting public-facing marketing or social media videos." },
-        { name: "Sway", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🟡 Internal", desc: "Interactive digital reports and newsletters.", yes: "Creating a modern, scrollable internal quarterly report.", no: "A document that absolutely must be printed for a meeting." },
-        { name: "PowerPoint Live", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🔴 Confidential", desc: "Engaging interactive presentations within Teams.", yes: "Presenting to a global team and letting them click through slides.", no: "One-on-one document editing and review." }
+        { name: "Forms", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🟢 Confidential Approved", role: "Everyone", desc: "Simple surveys, quizzes, and feedback polls.", yes: "Gathering feedback on a workshop or team lunch.", no: "Building a complex relational customer database." },
+        { name: "Planner", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🟢 Confidential Approved", role: "Everyone", desc: "Visual kanban boards for team task management.", yes: "Visualizing small steps for a group project.", no: "Tracking 1,000+ technical dependencies." },
+        { name: "Lists", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🟢 Confidential Approved", role: "Everyone", desc: "Information tracking for inventory and logs.", yes: "Tracking tech equipment checked out by the team.", no: "Heavy financial calculations (use Excel)." },
+        { name: "Whiteboard", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🟢 Confidential Approved", role: "Everyone", desc: "Infinite digital canvas for visual collaboration.", yes: "Drawing a process flow live during a Teams meeting.", no: "Creating final, professional branding logos." },
+        { name: "Bookings", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🟡 Internal/General", role: "Admins", desc: "Let external clients book time on your calendar.", yes: "Sending a link to a client so they can book an intro call.", no: "Scheduling internal department syncs." },
+        { name: "ToDo", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🟢 Confidential Approved", role: "Everyone", desc: "Personal task tracker and daily organizer.", yes: "Organizing your personal 'must-do' work tasks.", no: "Managing a project for a 10-person team." },
+        { name: "Stream", stage: "Foundation", time: "Quick", level: "🟢 Entry", sec: "🟢 Confidential Approved", role: "Everyone", desc: "Internal video storage and secure sharing hub.", yes: "Watching a recording of a staff training you missed.", no: "Hosting public-facing marketing videos." },
+        { name: "Sway", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🟡 Internal/General", role: "Comms", desc: "Interactive digital reports and newsletters.", yes: "Creating a modern, scrollable internal newsletter.", no: "Documents that must be printed." },
+        { name: "PowerPoint Live", stage: "Specialized", time: "Quick", level: "🟢 Entry", sec: "🟢 Confidential Approved", role: "Everyone", desc: "Interactive presentations within Teams.", yes: "Allowing a global audience to move through slides.", no: "One-on-one document review." }
     ];
 
     function render() {
         const grid = document.getElementById('grid');
         const s = document.getElementById('search').value.toLowerCase();
         const stage = document.getElementById('f-stage').value;
-        const time = document.getElementById('f-time').value;
         const level = document.getElementById('f-level').value;
+        const sec = document.getElementById('f-sec').value;
 
         const filtered = inventory.filter(t => {
             const mS = t.name.toLowerCase().includes(s) || t.desc.toLowerCase().includes(s);
             const mStage = stage === 'all' || t.stage === stage;
-            const mTime = time === 'all' || t.time === time;
             const mLevel = level === 'all' || t.level === level;
-            return mS && mStage && mTime && mLevel;
+            const mSec = sec === 'all' || t.sec.includes(sec.split(' ')[1]);
+            return mS && mStage && mLevel && mSec;
         });
 
         grid.innerHTML = '';
         filtered.forEach(t => {
+            const secColorClass = t.sec.includes('Confidential') ? 'sec-green' : (t.sec.includes('Public') ? 'sec-red' : 'sec-yellow');
             grid.innerHTML += `
                 <div class="card-perspective">
                     <div class="card-inner">
@@ -201,20 +210,19 @@
                             <h3 class="tool-title">${t.name}</h3>
                             <div style="margin: 0.8rem 0;">
                                 <span class="meta-tag">${t.level}</span>
-                                <span class="meta-tag">⏱️ ${t.time}</span>
                             </div>
                             <p class="tool-desc">${t.desc}</p>
-                            <div style="font-size: 0.75rem; font-weight:700; color:var(--accent)">🛡️ ${t.sec} Clearance</div>
+                            <div class="sec-badge ${secColorClass}">🛡️ ${t.sec}</div>
                         </div>
                         <div class="card-back">
-                            <span class="box-title" style="color:#818cf8; margin-bottom:1rem">HOW TO USE IT</span>
+                            <span class="box-title" style="color:#818cf8; margin-bottom:1rem">DATA USAGE RULES</span>
                             <div class="box box-yes">
-                                <span class="box-title">✅ YES, DO THIS:</span> ${t.yes}
+                                <span class="box-title">✅ SAFE FOR:</span> ${t.yes}
                             </div>
                             <div class="box box-no">
-                                <span class="box-title">❌ NO, AVOID THIS:</span> ${t.no}
+                                <span class="box-title">⚠️ HAZARD / DO NOT:</span> ${t.no}
                             </div>
-                            <p style="font-size:0.7rem; opacity:0.6; margin-top:auto; text-align:center">Hover away to flip back</p>
+                            <p style="font-size:0.7rem; opacity:0.6; margin-top:auto; text-align:center">Hover to flip back</p>
                         </div>
                     </div>
                 </div>`;
